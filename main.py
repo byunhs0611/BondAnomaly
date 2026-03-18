@@ -2,36 +2,40 @@ import asyncio
 import yfinance as yf
 import pandas as pd
 import os
-
-# 직접 토큰을 적지 말고, 환경 변수에서 가져오게 합니다.
-TOKEN = os.getenv('BOND_BOT_TOKEN')
-CHAT_ID = os.getenv('CHAT_ID')
 from telegram import Bot
 
-# [분석 엔진] 형섭님이 작성하신 로직
-def detect_bond_anomaly(threshold=0.001):
+# [분석 엔진] 형섭님의 로직 + 방어 코드 추가
+def detect_bond_anomaly(threshold=2.0):
     tickers = ["^TNX", "^TYX"]
-    # progress=False를 추가하면 터미널이 깨끗해집니다.
-    data = yf.download(tickers, period="100d", progress=False)['Close']
-
-# [추가] 데이터가 비어있으면 에러 대신 빈 결과를 리턴합니다.
-    if data.empty or len(data) < 2:
+    # 1. 데이터 다운로드
+    data = yf.download(tickers, period="100d", progress=False)
+    
+    # 데이터가 아예 없는 경우 체크
+    if data.empty or 'Close' not in data:
         print("⚠️ 야후 파이낸스에서 데이터를 가져오지 못했습니다.")
         return []
-        
-    returns = data.pct_change().dropna()
-    
-    # [추가] 계산 후에도 데이터가 없으면 리턴합니다.
-    if returns.empty:
-        return []
 
+    close_data = data['Close']
+    
+    # 2. 변화율 계산 및 결측치 제거
+    returns = close_data.pct_change().dropna()
+    
+    # 계산 후 데이터가 비어있는지 다시 체크 (IndexError 방지)
+    if returns.empty:
+        print("⚠️ 계산 가능한 수익률 데이터가 충분하지 않습니다.")
+        return []
+    
     avg_return = returns.mean()
     std_return = returns.std()
     
+    # 여기서 에러가 났던 부분을 안전하게 처리
     today_val = returns.iloc[-1]
     findings = []
     
     for ticker in tickers:
+        # 데이터에 해당 티커가 있는지 확인
+        if ticker not in today_val: continue
+        
         z_score = (today_val[ticker] - avg_return[ticker]) / std_return[ticker]
         
         if abs(z_score) > threshold:
@@ -47,28 +51,27 @@ def detect_bond_anomaly(threshold=0.001):
             
     return findings
 
-# [전송 핸들러] 분석 결과를 텔레그램으로 전송
-# [전송 핸들러] 분석 결과를 텔레그램으로 전송
+# [전송 핸들러]
 async def send_to_telegram():
-    # --- 여기에 본인의 정보 입력 ---
     TOKEN = os.getenv('BOND_BOT_TOKEN')
     CHAT_ID = os.getenv('CHAT_ID')
-    # ----------------------------
     
-    # 이 줄(47행)의 시작 부분이 윗줄(TOKEN = ...)과 정확히 수직으로 맞아야 합니다.
+    if not TOKEN or not CHAT_ID:
+        print("⚠️ Secrets 설정(TOKEN 또는 CHAT_ID)을 확인해주세요.")
+        return
+
     bot = Bot(token=TOKEN)
     
-    print("시장 데이터 분석 중...")
-    results = detect_bond_anomaly(threshold=0.001)
+    print("🚀 시장 데이터 분석 시작...")
+    results = detect_bond_anomaly(threshold=0.001) # 테스트를 위해 낮게 설정
     
     if not results:
-        print("평온한 시장입니다. 전송할 내용이 없습니다.")
+        print("✅ 분석 완료: 전송할 이상 변동이 없습니다.")
     else:
-        print(f"{len(results)}개의 이상치 발견! 전송을 시작합니다.")
+        print(f"📧 {len(results)}개의 알림 전송 시작!")
         for alert in results:
             await bot.send_message(chat_id=CHAT_ID, text=alert)
-            # 텔레그램 API 도배 방지를 위해 1초 대기
-            await asyncio.sleep(1)
+            await asyncio.sleep(1) 
+
 if __name__ == "__main__":
-    # 비동기 함수 실행
     asyncio.run(send_to_telegram())
