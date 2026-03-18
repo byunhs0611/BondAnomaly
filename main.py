@@ -13,8 +13,18 @@ def detect_bond_anomaly(threshold=0.001):
     tickers = ["^TNX", "^TYX"]
     # progress=False를 추가하면 터미널이 깨끗해집니다.
     data = yf.download(tickers, period="100d", progress=False)['Close']
-    
+
+# [추가] 데이터가 비어있으면 에러 대신 빈 결과를 리턴합니다.
+    if data.empty or len(data) < 2:
+        print("⚠️ 야후 파이낸스에서 데이터를 가져오지 못했습니다.")
+        return []
+        
     returns = data.pct_change().dropna()
+    
+    # [추가] 계산 후에도 데이터가 없으면 리턴합니다.
+    if returns.empty:
+        return []
+
     avg_return = returns.mean()
     std_return = returns.std()
     
