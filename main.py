@@ -38,12 +38,14 @@ def detect_bond_anomaly(threshold=2.0):
     return findings
 
 # [전송 핸들러] 분석 결과를 텔레그램으로 전송
+# [전송 핸들러] 분석 결과를 텔레그램으로 전송
 async def send_to_telegram():
     # --- 여기에 본인의 정보 입력 ---
-   TOKEN = os.getenv('BOND_BOT_TOKEN')
-   CHAT_ID = os.getenv('CHAT_ID')
+    TOKEN = os.getenv('BOND_BOT_TOKEN')
+    CHAT_ID = os.getenv('CHAT_ID')
     # ----------------------------
     
+    # 이 줄(47행)의 시작 부분이 윗줄(TOKEN = ...)과 정확히 수직으로 맞아야 합니다.
     bot = Bot(token=TOKEN)
     
     print("시장 데이터 분석 중...")
@@ -56,8 +58,7 @@ async def send_to_telegram():
         for alert in results:
             await bot.send_message(chat_id=CHAT_ID, text=alert)
             # 텔레그램 API 도배 방지를 위해 1초 대기
-            await asyncio.sleep(1) 
-
+            await asyncio.sleep(1)
 if __name__ == "__main__":
     # 비동기 함수 실행
     asyncio.run(send_to_telegram())
