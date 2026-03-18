@@ -40,8 +40,8 @@ def detect_bond_anomaly(threshold=2.0):
 # [전송 핸들러] 분석 결과를 텔레그램으로 전송
 async def send_to_telegram():
     # --- 여기에 본인의 정보 입력 ---
-    TOKEN = 8580619079:AAEEiiptbqCHVEAJ4AOP3m02tH2UrfsxjmU
-    CHAT_ID = 7586826521
+   TOKEN = os.getenv('BOND_BOT_TOKEN')
+   CHAT_ID = os.getenv('CHAT_ID')
     # ----------------------------
     
     bot = Bot(token=TOKEN)
