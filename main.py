@@ -8,7 +8,9 @@ from telegram import Bot
 def detect_bond_anomaly(threshold=2.0):
     tickers = ["^TNX", "^TYX"]
     # 1. 데이터 다운로드
-    data = yf.download(tickers, period="100d", progress=False)
+    # 기존 줄을 아래처럼 'threads=False'를 추가해서 바꿉니다.
+    data = yf.download(tickers, period="100d", progress=False, threads=False)
+
     
     # 데이터가 아예 없는 경우 체크
     if data.empty or 'Close' not in data:
