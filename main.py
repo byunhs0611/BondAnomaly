@@ -1,6 +1,11 @@
 import asyncio
 import yfinance as yf
 import pandas as pd
+import os
+
+# 직접 토큰을 적지 말고, 환경 변수에서 가져오게 합니다.
+TOKEN = os.getenv('BOND_BOT_TOKEN')
+CHAT_ID = os.getenv('CHAT_ID')
 from telegram import Bot
 
 # [분석 엔진] 형섭님이 작성하신 로직
