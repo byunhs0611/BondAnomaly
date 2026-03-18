@@ -9,7 +9,7 @@ CHAT_ID = os.getenv('CHAT_ID')
 from telegram import Bot
 
 # [분석 엔진] 형섭님이 작성하신 로직
-def detect_bond_anomaly(threshold=2.0):
+def detect_bond_anomaly(threshold=0.001):
     tickers = ["^TNX", "^TYX"]
     # progress=False를 추가하면 터미널이 깨끗해집니다.
     data = yf.download(tickers, period="100d", progress=False)['Close']
