@@ -49,7 +49,7 @@ async def send_to_telegram():
     bot = Bot(token=TOKEN)
     
     print("시장 데이터 분석 중...")
-    results = detect_bond_anomaly(threshold=2.0)
+    results = detect_bond_anomaly(threshold=0.001)
     
     if not results:
         print("평온한 시장입니다. 전송할 내용이 없습니다.")
