@@ -15,3 +15,30 @@
 ## 🚀 분석 결과
 - **나스닥 강세 시 익일 코스피 동반 상승 확률: 12.00%**
 - 통계적 기대값(약 31%)보다 낮은 수치를 기록하며, 한-미 증시 간의 **디커플링(Decoupling)** 현상을 데이터로 확인했습니다.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+This project investigates the lead-lag relationship between the US Nasdaq Index and the Korean KOSPI Index using Python-based quantitative analysis.
+
+## 🛠️ Tech Stack & Environment
+- **Language**: Python 3.13
+- **Data Source**: Yahoo Finance API (JSON Endpoint)
+- **Libraries**: Pandas, NumPy, Requests, Urllib3
+
+## 📊 Methodology
+The analysis focuses on whether a "surge" in the US market leads to a subsequent "surge" in the Korean market the following day.
+
+### 1. Z-Score Normalization
+To compare two different markets on equal ground, we calculate the rolling Z-Score of daily returns:
+$$Z = \frac{x - \mu_{100d}}{\sigma_{100d}}$$
+* **$x$**: Daily return
+* **$\mu$**: 100-day rolling mean
+* **$\sigma$**: 100-day rolling standard deviation
+
+### 2. Time-Lag Adjustment
+Since the US market ($t-1$) closes before the Korean market ($t$) opens, we shift the Nasdaq data by 1 day to analyze the predictive power of the US market as a leading indicator.
+
+## 🚀 Key Findings (5-Year Data)
+- **Nasdaq Surge Threshold**: $Z > 0.5$
+- **Probability of Co-movement**: **12.00%**
+- **Insight**: Contrary to the popular belief that "KOSPI follows Nasdaq," the data reveals a significant **Decoupling** effect, with only a 12% probability of a synchronized surge over the last 5 years.
