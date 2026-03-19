@@ -2,10 +2,8 @@ name: Bond Analysis Bot # 워크플로우 이름 (깃허브 Actions 탭에 표�
 
 on:
   schedule:
-    # cron 설정: 분 시 일 월 요일 (UTC 기준)
-    # 한국 시간(KST) 오전 9:00 = UTC 오전 0:00 입니다.
     - cron: '7 0 * * *'
-  workflow_dispatch: # 버튼을 눌러서 수동으로도 실행할 수 있게 해주는 옵션
+  workflow_dispatch:
 
 jobs:
   build:
